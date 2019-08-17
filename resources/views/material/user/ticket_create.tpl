@@ -1,121 +1,78 @@
-
-
-
-{include file='user/main.tpl'}
-
-
-
-
-
-
-
-	<main class="content">
-		<div class="content-header ui-content-header">
-			<div class="container">
-				<h1 class="content-heading">创建工单</h1>
-			</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+	<title>创建工单 - {$config["appName"]}</title>
+{include file='user/assets/css.tpl'}
+</head>
+<body class="menubar-left menubar-unfold menubar-light theme-primary">
+{include file='user/assets/header.tpl'}
+    <main id="app-main" class="app-main">
+        <div class="wrap">
+			<section class="app-content">
+    			<div class="row">
+      				<div class="col-lg-10 col-lg-offset-1">
+            			<div class="widget">
+	    					<header class="widget-header">
+                				<div class="widget-title pull-left">创建工单</div>
+                                <div class="pull-right"><small>工单处理时间 20:00 ~ 24:00</small></div>
+                			</header>
+							<div class="widget-body">
+                                        <div class="layui-form layui-form-pane">
+                          					<div class="layui-form-item">
+                          					    <label class="layui-form-label">工单标题</label>
+                          					    <div class="layui-input-block">
+                          					    	<input type="text" class="layui-input" id="title">
+                          					    </div>
+                          					</div>
+                           					<div class="layui-form-item">
+                                                <div id="editor">
+                                                    <p></p>
+                                                </div>
+                          					</div>
+                                            <div class="text-center">
+                                                <a class="layui-btn" id="submit">提交工单</a>
+                                            </div>
+                        				</div>
+							</div><!--.widget-body-->
+						</div><!--.widget-->
+                    </div>
+				</div>
+			</section>
 		</div>
-		<div class="container">
-			<div class="col-lg-12 col-sm-12">
-				<section class="content-inner margin-top-no">
-					
-					<div class="card">
-						<div class="card-main">
-							<div class="card-inner">
-								<div class="form-group form-group-label">
-									<label class="floating-label" for="title">标题</label>
-									<input class="form-control maxwidth-edit" id="title" type="text" >
-								</div>
-								
-								
-							</div>
-						</div>
-					</div>
-					
-					<div class="card">
-						<div class="card-main">
-							<div class="card-inner">
-								<div class="form-group form-group-label">
-									<label class="floating-label" for="content">内容</label>
-									<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/editor.md@1.5.0/css/editormd.min.css" />
-									<div id="editormd">
-										<textarea style="display:none;" id="content"></textarea>
-									</div>
-								</div>
-								
-								
-								
-								
-							</div>
-						</div>
-					</div>
-					
-					
-					
-					<div class="card">
-						<div class="card-main">
-							<div class="card-inner">
-								
-								<div class="form-group">
-									<div class="row">
-										<div class="col-md-10 col-md-push-1">
-											<button id="submit" type="submit" class="btn btn-block btn-brand">添加</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					
-					{include file='dialog.tpl'}
-
-							
-			</div>
-			
-			
-			
-		</div>
-	</main>
-
-
-
-
-
-
+{include file='user/dialog.tpl'}
 {include file='user/footer.tpl'}
-
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/editor.md@1.5.0/editormd.min.js"></script>
+	</main>
+{include file='user/assets/js.tpl'}
 <script>
     $(document).ready(function () {
+        var E = window.wangEditor;
+        var editor = new E('#editor');
+        editor.customConfig.menus = ['head','link','emoticon','image','undo','redo'];
+        editor.customConfig.zIndex = 100;
+        editor.create();
         function submit() {
-			$("#result").modal();
-            $("#msg").html("正在提交。");
             $.ajax({
                 type: "POST",
                 url: "/user/ticket",
                 dataType: "json",
                 data: {
-                    content: editor.getHTML(),
-					markdown: $('.editormd-markdown-textarea').val(),
+                    content: editor.txt.html(),
 					title: $("#title").val()
                 },
                 success: function (data) {
                     if (data.ret) {
-                        $("#result").modal();
-                        $("#msg").html(data.msg);
+                        layer.msg( data.msg );
                         window.setTimeout("location.href='/user/ticket'", {$config['jump_delay']});
                     } else {
-                        $("#result").modal();
-                        $("#msg").html(data.msg);
+                        layer.msg( data.msg );
                     }
                 },
                 error: function (jqXHR) {
-                    $("#msg-error").hide(10);
-                    $("#msg-error").show(100);
-                    $("#msg-error-p").html("发生错误：" + jqXHR.status);
+                    layer.msg( "发生错误：" + jqXHR.status );
+                    
                 }
             });
         }
@@ -124,28 +81,6 @@
             submit();
         });
     });
-	
-    $(function() {
-        editor = editormd("editormd", {
-             path : "https://cdn.jsdelivr.net/npm/editor.md@1.5.0/lib/", // Autoload modules mode, codemirror, marked... dependents libs path
-			height: 720,
-			saveHTMLToTextarea : true,
-			emoji : true
-        });
-
-        /*
-        // or
-        var editor = editormd({
-            id   : "editormd",
-            path : "../lib/"
-        });
-        */
-    });
 </script>
-
-
-
-
-
-
-
+</body>
+</html>

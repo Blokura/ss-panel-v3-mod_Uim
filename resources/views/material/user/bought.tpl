@@ -1,128 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+	<title>购买记录 - {$config["appName"]}</title>
+{include file='user/assets/css.tpl'}
+</head>
+<body class="menubar-left menubar-unfold menubar-light theme-primary">
+{include file='user/assets/header.tpl'}
+    <main id="app-main" class="app-main">
+        <div class="wrap">
+			<section class="app-content">
+    			<div class="row">
+              		{foreach $shops as $shop}
+					<div class="col-lg-3 col-md-6">
+						<div class="widget box">
+	    					<header class="widget-header">
+                				<div class="widget-title"><i class="iconfont icon-gift"></i>&nbsp;{$shop->shop()->name}</div>
+                			</header>
+	    					<hr class="widget-separator">
+							<div class="widget-body">
+	    						<p>价格：{$shop->price} 元</p>
+								<p>{if $shop->shop()->auto_reset_bandwidth==0}不自动重置流量{else}自动重置流量{/if}</p>
+	    						<p>{if $shop->renew==0}不自动续费{else}在 {$shop->renew_date()} 续费{/if}</p>
+								<hr/>
+								<div class="text-center">
+									<a class="layui-btn btn-sm {if $shop->renew==0}layui-btn-disabled{/if}" {if $shop->renew != 0} href="javascript:void(0);" onClick="delete_modal_show('{$shop->id}')"{/if}>关闭自动续费</a>
+								</div>
+							</div>
+	    				</div>
+                    </div>
+              		{/foreach}
+                    <div class="col-md-12">
+              			<div class="pull-right">{$shops->render()}</div>
+                    </div>
+				</div>
 
-
-
-{include file='user/main.tpl'}
-
-
-
-
-
-
-
-	<main class="content">
-		<div class="content-header ui-content-header">
-			<div class="container">
-				<h1 class="content-heading">购买记录</h1>
-			</div>
+				<div aria-hidden="true" class="modal fade" id="delete_modal" role="dialog" tabindex="-1">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+								</button>
+								<h4 class="modal-title">确认要关闭自动续费吗？</h4>
+							</div>
+							<div class="modal-body">
+								<p>请确认！</p>
+							</div>
+							<div class="modal-footer">
+								<p class="text-right"><button class="layui-btn" data-dismiss="modal" type="button">取消</button><button class="layui-btn" data-dismiss="modal" id="delete_input" type="button">确定</button></p>
+							</div>
+						</div>
+					</div>
+				</div>			
+			</section>
 		</div>
-		<div class="container">
-			<div class="col-lg-12 col-sm-12">
-				<section class="content-inner margin-top-no">
-					
-					<div class="card">
-						<div class="card-main">
-							<div class="card-inner">
-								<p>系统中您的购买记录。</p>
-							</div>
-						</div>
-					</div>
-
-					<div class="card">
-						<div class="card-main">
-							<div class="card-inner">
-								<div class="card-table">
-									<div class="table-responsive table-user">
-										{$shops->render()}
-										<table class="table">
-											<tr>
-												
-											 <!--   <th>ID</th> -->
-												<th>商品名称</th>
-												<th>内容</th>
-												<th>价格</th>
-												<th>续费时间</th>
-												<th>续费时重置流量</th>
-												<th>操作</th>
-												
-											</tr>
-											{foreach $shops as $shop}
-											<tr>
-												
-										  <!--       <td>#{$shop->id}</td> -->
-												<td>{$shop->shop()->name}</td>
-												<td>{$shop->shop()->content()}</td>
-												<td>{$shop->price} 元</td>
-												{if $shop->renew==0}
-												<td>不自动续费</td>
-												{else}
-												<td>在 {$shop->renew_date()} 续费</td>
-												{/if}
-												
-												{if $shop->shop()->auto_reset_bandwidth==0}
-												<td>不自动重置</td>
-												{else}
-												<td>自动重置</td>
-												{/if}
-											  <td>
-													<a class="btn btn-brand" {if $shop->renew==0}disabled{else} href="javascript:void(0);" onClick="delete_modal_show('{$shop->id}')"{/if}>关闭自动续费</a>
-												</td>
-												
-											</tr>
-											{/foreach}
-										</table>
-										{$shops->render()}
-									</div>					
-								</div>
-							</div>
-						</div>
-					</div>
-					
-					
-					
-					
-					<div aria-hidden="true" class="modal modal-va-middle fade" id="delete_modal" role="dialog" tabindex="-1">
-						<div class="modal-dialog modal-xs">
-							<div class="modal-content">
-								<div class="modal-heading">
-									<a class="modal-close" data-dismiss="modal">×</a>
-									<h2 class="modal-title">确认要关闭自动续费？</h2>
-								</div>
-								<div class="modal-inner">
-									<p>请您确认。</p>
-								</div>
-								<div class="modal-footer">
-									<p class="text-right"><button class="btn btn-flat btn-brand-accent waves-attach waves-effect" data-dismiss="modal" type="button">取消</button><button class="btn btn-flat btn-brand-accent waves-attach" data-dismiss="modal" id="delete_input" type="button">确定</button></p>
-								</div>
-							</div>
-						</div>
-					</div>
-					
-					{include file='dialog.tpl'}
-
-							
-			</div>
-			
-			
-			
-		</div>
-	</main>
-
-
-
-
-
-
+{include file='user/dialog.tpl'}
 {include file='user/footer.tpl'}
-
-
-
-
+	</main>
+{include file='user/assets/js.tpl'}
+</body>
 <script>
 function delete_modal_show(id) {
 	deleteid=id;
 	$("#delete_modal").modal();
 }
-
 $(document).ready(function(){
 	function delete_id(){
 		$.ajax({
@@ -134,17 +78,14 @@ $(document).ready(function(){
 			},
 			success:function(data){
 				if(data.ret){
-					$("#result").modal();
-					$("#msg").html(data.msg);
+					layer.open({ content: data.msg });
 					window.setTimeout("location.href=window.location.href", {$config['jump_delay']});
 				}else{
-					$("#result").modal();
-					$("#msg").html(data.msg);
+					layer.open({ content: data.msg });
 				}
 			},
 			error:function(jqXHR){
-				$("#result").modal();
-				$("#msg").html(data.msg+"  发生错误了。");
+				layer.open({ content: data.msg+'  发生错误了。' });
 			}
 		});
 	}
@@ -152,12 +93,5 @@ $(document).ready(function(){
 		delete_id();
 	});
 })
-	
 </script>
-
-
-
-
-
-
-
+</html>

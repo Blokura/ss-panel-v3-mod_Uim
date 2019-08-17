@@ -1,81 +1,46 @@
-
-
-
-
-
-
-{include file='user/main.tpl'}
-
-
-
-
-
-
-	<main class="content">
-		<div class="content-header ui-content-header">
-			<div class="container">
-				<h1 class="content-heading">删除我的帐号</h1>
-			</div>
-		</div>
-		<div class="container">
-			<section class="content-inner margin-top-no">
-				<div class="row">
-				
-					<div class="col-lg-12 col-md-12">
-						<div class="card margin-bottom-no">
-							<div class="card-main">
-								<div class="card-inner">
-									<div class="card-inner">
-										<h4>注意！</h4>
-
-										<p>帐号删除后，您的所有数据都会被<b>真实地</b>删除。</p>
-
-										<p>如果想重新使用本网站提供的服务，您需要重新注册。</p>
-										
-									</div>
-									
-								</div>
-							</div>
-						</div>
-					</div>
-					
-					<div class="col-lg-12 col-md-12">
-						<div class="card margin-bottom-no">
-							<div class="card-main">
-								<div class="card-inner">
-									<div class="card-inner">
-										<p class="card-heading">输入当前密码以验证身份</p>
-										<div class="form-group form-group-label">
-											<label class="floating-label" for="passwd">当前密码（必填）</label>
-											<input class="form-control" id="passwd" type="password">
-										</div>
-									</div>
-									<div class="card-action">
-										<div class="card-action-btn pull-left">
-											<button class="btn btn-flat waves-attach" id="kill" ><span class="icon">check</span>&nbsp;删除我的帐号</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					
-					{include file='dialog.tpl'}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+	<title>资料编辑 - {$config["appName"]}</title>
+{include file='user/assets/css.tpl'}
+</head>
+<body class="menubar-left menubar-unfold menubar-light theme-primary">
+{include file='user/assets/header.tpl'}
+    <main id="app-main" class="app-main">
+        <div class="wrap">
+			<section class="app-content">
+    			<div class="row">
+      				<div class="col-md-12">
+                        <div class="col-md-6 col-md-offset-3">
+ 							<div class="widget">
+								<header class="widget-header">
+									<div class="widget-title pull-left"><i class="iconfont icon-error"></i>&nbsp;确认注销？</div>
+								</header><!-- .widget-header -->
+								<hr class="widget-separator" />
+								<div class="widget-body">
+									<div class="layui-form layui-form-pane">
+                        	  			<div class="layui-form-item">
+                        	  			    <label class="layui-form-label">验证密码</label>
+                        	  			    <div class="layui-input-block">
+                        	  			    	<input type="text" class="layui-input" id="passwd">
+                        	  			    </div>
+                        	  			</div>
+                                        <p class="text-right"><button class="layui-btn" id="kill">注销</button></p>
+                        			</div>
+								</div><!-- .widget-body -->
+							</div><!-- .widget -->
+                        </div>
+                    </div>
 				</div>
 			</section>
 		</div>
-	</main>
-
-
-
-
-
-
-
+{include file='user/dialog.tpl'}
 {include file='user/footer.tpl'}
-
-
-
+	</main>
+{include file='user/assets/js.tpl'}
 <script>
     $(document).ready(function () {
         $("#kill").click(function () {
@@ -88,20 +53,18 @@
                 },
                 success: function (data) {
                     if (data.ret) {
-                        $("#result").modal();
-						$("#msg").html(data.msg);
+                        layer.open({ content: data.msg }); 
                         window.setTimeout("location.href='/'", {$config['jump_delay']});
                     } else {
-                        $("#result").modal();
-						$("#msg").html(data.msg);
+                        layer.open({ content: data.msg }); 
                     }
                 },
                 error: function (jqXHR) {
-					$("#result").modal();
-                    $("#msg").html("发生错误：" + jqXHR.status + data.msg);
+					layer.open({ content: '发生错误：' + jqXHR.status + data.msg }); 
                 }
             })
         })
     })
 </script>
-
+</body>
+</html>

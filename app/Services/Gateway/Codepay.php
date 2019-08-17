@@ -65,8 +65,8 @@ class Codepay extends AbstractPayment
             'type' => $type,//1支付宝支付 2QQ钱包 3微信支付
             'price' => $price,//金额100元
             'param' => '',//自定义参数
-            'notify_url' => $url . '/payment/notify',//通知地址
-            'return_url' => $url . '/user/code',//跳转地址
+            'notify_url' => 'https://moessr.xyz/payment/notify',//通知地址
+            'return_url' => 'https://moessr.xyz/user/code',//跳转地址
         ); //构造需要传递的参数
 
         ksort($data); //重新排序$data数组
@@ -87,7 +87,7 @@ class Codepay extends AbstractPayment
             $urls .= "$key=" . urlencode($val); //拼接为url参数形式并URL编码参数值
         }
         $query = $urls . '&sign=' . md5($sign . $codepay_key); //创建订单所需的参数
-        $url = 'https://codepay.fateqq.com:51888/creat_order/?' . $query; //支付页面
+        $url = 'https://codepay.fateqq.com/creat_order/?' . $query; //支付页面
 
 
         header('Location:' . $url);

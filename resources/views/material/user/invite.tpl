@@ -1,173 +1,136 @@
-{include file='user/main.tpl'}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+	<title>邀请好友 - {$config["appName"]}</title>
+{include file='user/assets/css.tpl'}
+</head>
+<body class="menubar-left menubar-unfold menubar-light theme-primary">
+{include file='user/assets/header.tpl'}
+    <main id="app-main" class="app-main">
+        <div class="wrap">
+			<section class="app-content">
+    			<div class="row">
+      				<div class="col-sm-10 col-sm-offset-1">
+                        <div class="row">
+        					<div class="col-md-6">
+								<div class="widget">
+									<header class="widget-header">
+										<div class="widget-title"><i class="iconfont icon-bulb"></i>&nbsp;说明</div>
+									</header><!-- .widget-header -->
+									<hr class="widget-separator" />
+									<div class="widget-body">
+										<p>邀请链接请给认识或者需要的人。</p>
+                                        <p>您会获得 <font color="red">{$config["invite_gift"]}G</font> 流量奖励。</p>
+                        				<p>对方充值时您还会获得对方充值金额的 <font color="red">{$config["code_payback"]} %</font> 的返利。</p>
+                        				<p>已获得返利：<font color="red">{$paybacks_sum}</font> 元</p>
+									</div><!--.widget-body-->
+								</div><!--.widget--> 
+      						</div>
+				
+							{if $user->class>=1}
+            				{if $user->invite_num!=-1}
+            				<div class="col-md-6">
+								<div class="widget">
+									<header class="widget-header">
+										<div class="widget-title pull-left"><i class="iconfont icon-link"></i>&nbsp;邀请链接</div>
+                                        <div class="pull-right">
+                    				        <button type="button" class="layui-btn bg-color-blue layui-btn-sm btn-top" id="reset-link">重置链接</button>
+								        </div>
+									</header><!-- .widget-header -->
+									<hr class="widget-separator" />
+									<div class="widget-body">
+                        				<p>剩余可邀请次数：{if $user->invite_num<0}<font color="red">无限</font>{else}<font color="red">{$user->invite_num}</font>{/if}</p>
+                						<div class="input-group">	
+											<input type="text" class="input form-control form-control-monospace" readonly value="{$config["baseUrl"]}/auth/register?code={$code->code}" readonly="true">
+                      						<span class="input-group-btn"><button type="button" class="layui-btn copy-text" data-clipboard-text="{$config["baseUrl"]}/auth/register?code={$code->code}">复制</button></span>
+                						</div>
+									</div><!--.widget-body-->
+								</div><!--.widget-->
+            					{/if}
 
-	<main class="content">
-		<div class="content-header ui-content-header">
-			<div class="container">
-				<h1 class="content-heading">邀请</h1>
-			</div>
-		</div>
-		<div class="container">
-			<section class="content-inner margin-top-no">
-				<div class="row">
+		    					{if $config['invite_price']>=0}
+								<div class="widget">
+									<header class="widget-header">
+										<div class="widget-title"><i class="iconfont icon-adduser"></i>&nbsp;购买邀请次数</div>
+									</header><!-- .widget-header -->
+									<hr class="widget-separator" />
+									<div class="widget-body">
+                        				<p>邀请码价格：<font color="red">{$config['invite_price']}</font> 元/个</p>
+                						<div class="input-group">	
+											<input type="num" class="input form-control form-control-monospace" id="buy-invite-num" placeholder="请输入购买数量">
+                      						<span class="input-group-btn"><button type="button" class="layui-btn" id="buy-invite">购买</button></span>
+                						</div>
+									</div><!--.widget-body-->
+								</div><!--.widget--> 
+							{/if}
+                            </div>
+							{else}
+      						<div class="col-md-6">
+								<div class="widget">
+									<header class="widget-header">
+										<h4 class="widget-title"><i class="iconfont icon-link"></i>&nbsp;邀请链接</h4>
+									</header><!-- .widget-header -->
+									<hr class="widget-separator" />
+									<div class="widget-body">
+                						<div class="input-group">	
+											<p><font color="red">尊敬的 {$user->user_name}，您无法使用邀请链接，请 <a href="/user/shop">升级</a> 成为会员。</font></p>
+                						</div>
+									</div><!--.widget-body-->
+								</div><!--.widget-->
+            				</div>
+							{/if}
 
-					<div class="col-xx-12">
-						<div class="card margin-bottom-no">
-							<div class="card-main">
-								<div class="card-inner">
-									<div class="card-inner">
-										<p class="card-heading">说明</p>
-										<p>您每邀请1位用户注册：</p>
-										<p>您会获得<code>{$config["invite_gift"]} G</code>流量奖励。</p>
-										<p>对方将获得<code>{$config["invite_get_money"]}</code>元奖励作为初始资金。</p>
-										<p>对方充值时您还会获得对方充值金额的 <code>{$config["code_payback"]} %</code> 的返利。</p>
-										<p class="card-heading">已获得返利：<code>{$paybacks_sum}</code> 元</p>
-									</div>
 
-								</div>
-							</div>
-						</div>
-					</div>
-
-					{if $user->class!=0}
-
-					{if $user->invite_num!=-1}
-					<div class="col-xx-12">
-						<div class="card margin-bottom-no">
-							<div class="card-main">
-								<div class="card-inner margin-bottom-no">
-									<div class="card-inner margin-bottom-no">
-											<div class="cardbtn-edit">
-													<div class="card-heading">邀请链接</div>
-													<div class="reset-flex"><span>重置链接</span><a class="reset-link btn btn-brand-accent btn-flat" ><i class="icon">autorenew</i>&nbsp;</a></div>
-											</div>
-										<p>剩余可邀请次数：{if $user->invite_num<0}无限{else}<code>{$user->invite_num}</code>{/if}</p>
-										<p>发送邀请链接给有需要的人，邀请他人注册时，请将以下链接发给被邀请者</p>
-										<div class="invite-link">
-											<input type="text" class="input form-control form-control-monospace cust-link" name="input1" readonly="" value="{$config["baseUrl"]}/auth/register?code={$code->code}">
-											<button class="copy-text btn btn-subscription" type="button" data-clipboard-text="{$config["baseUrl"]}/auth/register?code={$code->code}">点击复制</button>				
-										</div>
-										<div class="invite-link">
-											<input type="text" class="input form-control form-control-monospace cust-link" name="input2" readonly="" value="{$config["baseUrl"]}/#/auth/register?code={$code->code}">
-											<button class="copy-text btn btn-subscription" type="button" data-clipboard-text="{$config["baseUrl"]}/#/auth/register?code={$code->code}">点击复制</button>				
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					{if $config['custom_invite_price']>=0}
-					<div class="col-xx-12 {if $config['invite_price']>=0}col-lg-6{/if}">
-							<div class="card margin-bottom-no">
-								<div class="card-main">
-									<div class="card-inner margin-bottom-no">
-										<div class="card-inner margin-bottom-no">
-												<div class="cardbtn-edit">
-													<div class="card-heading">定制链接后缀 <code class="card-tag tag-green">{$config['custom_invite_price']} RMB/次</code></div>
-													<button class="btn btn-flat" id="custom-invite-confirm"><span class="icon">check</span>&nbsp;</button>
-												</div>
-											<p>例:输入<code>vip</code>则链接变为<code>{$config["baseUrl"]}/auth/register?code=vip</code></p>
-											<div class="form-group form-group-label">
-												<label class="floating-label" for="custom-invite-link">输入链接后缀</label>
-												<input class="form-control maxwidth-edit" id="custom-invite-link" type="num">
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						{/if}
-					{/if}
-
-					{if $config['invite_price']>=0}
-					<div class="col-xx-12 {if $config['custom_invite_price']>=0}col-lg-6{/if}">
-						<div class="card margin-bottom-no">
-							<div class="card-main">
-								<div class="card-inner">
-									<div class="card-inner">
-									<div class="cardbtn-edit">
-											<div class="card-heading">购买邀请次数 <code class="card-tag tag-green">{$config['invite_price']} RMB/个</code></div>
-											<button class="btn btn-flat" id="buy-invite"><span class="material-icons">shopping_cart</span></button>
-									</div>		
-										<p>在下方输入需要购买的邀请次数</p>
-										<div class="form-group form-group-label">
-											<label class="floating-label" for="buy-invite-num">输入购买次数</label>
-											<input class="form-control maxwidth-edit" id="buy-invite-num" type="num">
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					{/if}
-
-                   	{else}
-
-                  	<div class="col-xx-12">
-						<div class="card margin-bottom-no">
-							<div class="card-main">
-								<div class="card-inner">
-                                 	<p class="card-heading">邀请链接</p>
-									<h3>{$user->user_name}，您不是VIP暂时无法使用邀请链接，<a href="/user/shop">成为VIP请点击这里</a></h3>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					{/if}
-					<div class="col-xx-12">
-                        <div class="card">
-	                        <div class="card-main">
-		                        <div class="card-inner">
-			                        <div class="card-table">
-										<div class="table-responsive bgc-fix table-user">
-											{$paybacks->render()}
-											<table class="table">
+							<div class="col-md-12">
+								<div class="widget">
+									<header class="widget-header">
+										<div class="widget-title"><i class="iconfont icon-unorderedlist"></i>&nbsp;邀请记录</div>
+									</header><!-- .widget-header -->
+									<hr class="widget-separator" />
+									<div class="widget-body">
+										{$paybacks->render()}
+										<table class="table ">
+                        					<thead>
 												<tr>
-					
-												 <!--   <th>ID</th> -->
-													<th>ID</th>
+                                					<th>ID</th>
 													<th>被邀请用户ID</th>
 													<th>获得返利</th>
-												</tr>
-												{foreach $paybacks as $payback}
-												<tr>
-					
-											  <!--       <td>#{$payback->id}</td> -->
-													<td>{$payback->id}</td>
-													<td>{$payback->userid}</td>
-													<td>{$payback->ref_get} 元</td>
-					
-												</tr>
-												{/foreach}
-											</table>
-											{$paybacks->render()}
-										</div>
-			                        </div>
-		                        </div>
-	                        </div>
-                        </div>
-					
-					</div>
+                            					</tr>
+                            				</thead>
+                            				{foreach $paybacks as $payback}
+                            				<tr>
+                                				<td>{$payback->id}</td>
+												<td>{$payback->userid}</td>
+												<td>{$payback->ref_get} 元</td>
+                            				</tr>
+                            				{/foreach}
+                        				</table>
+										{$paybacks->render()}
+									</div>
+								</div>
+							</div>
 
-					{include file='dialog.tpl'}
-
-				</div>
+  						</div>
+              		</div>
+  				</div>
 			</section>
 		</div>
-	</main>
-
+{include file='user/dialog.tpl'}
 {include file='user/footer.tpl'}
-
+	</main>
+{include file='user/assets/js.tpl'}
+</body>
 <script>
 	$(function(){
 		new Clipboard('.copy-text');
 	});
-
 	$(".copy-text").click(function () {
-		$("#result").modal();
-		$("#msg").html("已复制到您的剪贴板，请您继续接下来的操作。");
+		layer.open({ content: '已复制到您的剪贴板，请您继续接下来的操作。' });
 	});
-
+  
     $(document).ready(function () {
         $("#invite").click(function () {
             $.ajax({
@@ -178,15 +141,14 @@
                     window.location.reload();
                 },
                 error: function (jqXHR) {
-                    $("#result").modal();
-					$("#msg").html("发生错误：" + jqXHR.status);
+					layer.open({ content: '发生错误：' + jqXHR.status });
                 }
             })
         })
     })
 </script>
-
 <script>
+{include file='table/js_1.tpl'}
 
 $("#buy-invite").click(function () {
     $.ajax({
@@ -198,54 +160,22 @@ $("#buy-invite").click(function () {
         },
         success: function (data) {
              if (data.ret) {
-     			$("#result").modal();
-				$("#msg").html(data.msg);
+     			layer.open({ content: data.msg });
 				window.setTimeout("location.href='/user/invite'", {$config['jump_delay']});
 	        } else {
-                $("#result").modal();
-			    $("#msg").html(data.msg);
+                layer.open({ content: data.msg });
             }
 	    },
         error: function (jqXHR) {
-            $("#result").modal();
-        	$("#msg").html(data.msg+"     出现了一些错误。");
+            layer.open({ content: data.msg+'     出现了一些错误。' });
         }
     })
 });
-
-$("#custom-invite-confirm").click(function () {
-    $.ajax({
-        type: "POST",
-        url: "/user/custom_invite",
-        dataType: "json",
-        data: {
-            customcode: $("#custom-invite-link").val(),
-        },
-        success: function (data) {
-             if (data.ret) {
-     			$("#result").modal();
-				$("#msg").html(data.msg);
-				window.setTimeout("location.href='/user/invite'", {$config['jump_delay']});
-	        } else {
-                $("#result").modal();
-			    $("#msg").html(data.msg);
-            }
-	    },
-        error: function (jqXHR) {
-            $("#result").modal();
-        	$("#msg").html(data.msg+"     出现了一些错误。");
-        }
-    })
-});
-
 </script>
-
 <script>
-
-$(".reset-link").click(function () {
-	$("#result").modal();
-	$("#msg").html("已重置您的邀请链接，复制您的邀请链接发送给其他人！");
+$("#reset-link").click(function () {
+    layer.open({ content: "已重置您的邀请链接！" });
 	window.setTimeout("location.href='/user/inviteurl_reset'", {$config['jump_delay']});
 });
-
 </script>
+</html>

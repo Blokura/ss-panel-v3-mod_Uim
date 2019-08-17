@@ -1668,14 +1668,17 @@ class UserController extends BaseController
 
         if (!$this->user->isAbleToCheckin()) {
             $res['ret'] = 0;
-            $res['msg'] = '您似乎已经签到过了...';
+            $res['msg'] = '您似乎已经卖过萌了...';
             return $response->getBody()->write(json_encode($res));
         }
         $traffic = random_int(Config::get('checkinMin'), Config::get('checkinMax'));
         $this->user->transfer_enable += Tools::toMB($traffic);
         $this->user->last_check_in_time = time();
         $this->user->save();
-        $res['msg'] = sprintf('获得了 %d MB流量.', $traffic);
+        if($this->user->class == 1)$user_vip_name = "死库水";
+        if($this->user->class == 2)$user_vip_name = "女仆装";
+        if($this->user->class == 3)$user_vip_name = "天使婚纱";
+        $res['msg'] = sprintf('穿上'.$user_vip_name.',卖萌大成功!获得了 %d MB流量!', $traffic);
         $res['unflowtraffic'] = $this->user->transfer_enable;
         $res['traffic'] = Tools::flowAutoShow($this->user->transfer_enable);
         $res['trafficInfo'] = array(

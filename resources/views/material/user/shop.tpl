@@ -1,225 +1,166 @@
-
-
-
-
-
-
-{include file='user/main.tpl'}
-
-
-
-
-
-	<main class="content">
-		<div class="content-header ui-content-header">
-			<div class="container">
-				<h1 class="content-heading">商品列表</h1>
-			</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+	<title>服装商店 - {$config["appName"]}</title>
+{include file='user/assets/css.tpl'}
+  <style>.text-bz{ overflow: hidden;text-overflow: ellipsis;white-space: nowrap; }</style>
+</head>
+<body class="menubar-left menubar-unfold menubar-light theme-primary">
+{include file='user/assets/header.tpl'}
+    <main id="app-main" class="app-main">
+        <div class="wrap">
+			<section class="app-content">
+              	<div class="row">
+        			<div class="col-md-12">
+                        <div class="layui-elem-quote">
+                            <p>温馨提示：您购买的商品有效期会从当前时间开始计算，流量将会重置，请确保流量使用完毕再购买。</p>
+                            <span>账户余额：<font color="red">{$user->money}</font> 元 {if $user->money == 0}（余额不足，请 <a href="/user/code">充值</a>）{/if}</span>
+                        </div>
+                   		<div class="row">
+          					{foreach $shops as $shop}
+        					<div class="col-lg-4 col-md-6">
+								<div class="widget box">
+	    							<header class="widget-header">
+                						<div class="widget-title"><i class="iconfont icon-tag"></i>&nbsp;{$shop->name}</div>
+                					</header>
+	    							<div class="widget-body" style="padding-top: 0;">
+                                        <table class="layui-table">
+                                            <tr>
+                                                <td>获得流量</td>
+                                                <td>{$shop->bandwidth()} G</td>
+                                            </tr>
+                                            <tr>
+                                                <td>等级提升</td>
+                                                <td>
+                                                    {if $shop->user_class() == "0"}
+                                                        Lv.0 无衣服
+													{elseif $shop->user_class() == "1"}
+                                                        Lv.1 死库水
+                                                    {elseif $shop->user_class() == "2"}
+                                                        Lv.2 女仆装
+                                                    {elseif $shop->user_class() == "3"}
+                                                        Lv.3 天使婚纱
+                                                    {/if}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>套餐时长</td>
+                                                <td>{if $shop->class_expire() == "0"}无{else}{$shop->class_expire()} 天{/if}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>流量重置</td>
+                                                <td>{if $shop->reset_value() == '0' }无{else}{$shop->reset_value()} G{/if}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>端口速率</td>
+                                                <td>{if {$shop->speedlimit()} == '0' }无限制{else}{$shop->speedlimit()} Mbps{/if}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>设备限制</td>
+                                                <td>{if {$shop->connector()} == '0' }无限制{else}{$shop->connector()} 台{/if}</td>
+                                            </tr>
+                                        </table>
+                                        {foreach $shop->content_extra() as $service}
+									         <p class="text-bz"><b>介绍：</b>{$service[1]}</p>
+									    {/foreach}
+                                        <hr />
+                                        <div class="shop-footer" style="height: 38px;">
+                                        <div class="pull-left" style="padding: 10px;height: 38px;">
+                                            价格：{$shop->price} 元
+	    								</div>
+                                        <div class="pull-right">
+                                            {if $shop->user_class() == "0" && $user->class == 0}
+                                                <a class="layui-btn {$shop->auto_renew} layui-btn-disabled" href="javascript:void(0);">购买</a>
+                                            {else}
+                                                <a class="layui-btn" href="javascript:void(0);" onClick="buy('{$shop->id}',{$shop->auto_renew})">购买</a>
+                                            {/if}
+                                        </div>
+                                        </div>
+                					</div>
+	    						</div>  
+							</div>
+        					{/foreach}
+                        </div>
+					</div>
+				</div>
+              
+				<div aria-hidden="true" class="modal fade" id="coupon_modal" role="dialog" tabindex="-1">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+									&times;
+								</button>
+								<h4 class="modal-title">
+                                	您有优惠码吗？
+                                </h4>
+							</div>
+							<div class="modal-body">
+								<div class="form-group form-group-label">
+									<label class="floating-label" for="coupon">有的话，请在这里输入。没有的话，直接确定吧</label>
+									<input class="form-control" id="coupon" type="text">
+								</div>
+							</div>
+							<div class="modal-footer">
+								<p class="text-right"><button class="layui-btn" data-dismiss="modal" id="coupon_input" type="button">确定</button></p>
+							</div>
+						</div>
+					</div>
+				</div>
+					
+				<div aria-hidden="true" class="modal fade" id="order_modal" role="dialog" tabindex="-1">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+									&times;
+								</button>
+								<h4 class="modal-title">
+                                	订单确认
+                                </h4>
+							</div>
+							<div class="modal-body">
+								<p id="name">商品名称：</p>
+								<p id="credit">优惠额度：</p>
+								<p id="total">总金额：</p>
+                                <label for="disableothers">
+                                    <input checked  id="disableothers" type="checkbox">&nbsp;关闭旧套餐自动续费
+                                </label>
+                                <br />
+                                <label for="autorenew" id="autor">
+                                    <input checked id="autorenew" type="checkbox">&nbsp;自动续费
+                                </label>
+							</div>
+							<div class="modal-footer">
+								<p class="text-right"><button class="layui-btn" data-dismiss="modal" id="order_input" type="button">确定</button></p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
 		</div>
-		<div class="container">
-			<div class="col-lg-12 col-sm-12">
-				<section class="content-inner margin-top-no">
-					
-					<div class="card">
-						<div class="card-main">
-							<div class="card-inner">
-								<p>商品不可叠加，新购商品会覆盖旧商品的效果。</p>
-								<p>购买新套餐时，如果未关闭旧套餐自动续费，则旧套餐的自动续费依然生效。</p>
-								<p>当前余额：<code>{$user->money}</code> 元</p>
-							</div>
-						</div>
-					</div>
-
-					<div class="ui-switch">
-                         <div class="card">
-							 <div class="card-main">
-								 <div class="card-inner ui-switch">
-										<div class="switch-btn" id="switch-cards"><a href="#" onclick="return false"><i class="mdui-icon material-icons">apps</i></a></div>
-										<div class="switch-btn" id="switch-table"><a href="#" onclick="return false"><i class="mdui-icon material-icons">dehaze</i></a></div>
-								 </div>
-							 </div>
-						 </div>
-					</div>
-						
-            <div class="shop-flex">
-				
-				{foreach $shops as $shop}
-                  <div class="card">
-					  <div class="card-main">
-								<div class="shop-name">{$shop->name}</div>
-								<div class="shop-price">{$shop->price}</div>
-								<div class="shop-tat">
-									<span>{$shop->bandwidth()}</span> / <span>{$shop->class_expire()}</span>
-								</div>
-								<div class="shop-cube">
-									<div>
-										<div class="cube-detail">
-											<span>Lv.</span>{$shop->user_class()}
-										</div>
-										<div class="cube-title">
-											VIP
-										</div>
-									</div>
-									<div>
-										<div class="cube-detail">
-											{if {$shop->connector()} == '0' }无限制{else}{$shop->connector()}<span> 个</span>{/if}
-										</div>
-										<div class="cube-title">
-											客户端数量
-										</div>
-									</div>
-									<div>
-										<div class="cube-detail">
-											{if {$shop->speedlimit()} == '0' }无限制{else}{$shop->speedlimit()}<span> Mbps</span>{/if}
-										</div>
-										<div class="cube-title">
-											端口速率
-										</div>
-									</div>
-
-								</div>
-								<div class="shop-content">
-									<div class="shop-content-left">账号有效期:</div><div class="shop-content-right">{$shop->expire()}<span>天</span></div>
-									<div class="shop-content-left">重置周期:</div><div class="shop-content-right">{if {$shop->reset()} == '0' }N / A{else}{$shop->reset_exp()}<span>天</span>{/if}</div>
-									<div class="shop-content-left">重置频率:</div><div class="shop-content-right">{if {$shop->reset()} == '0' }N / A{else}{$shop->reset_value()}<span>G</span> / {$shop->reset()}<span>天</span>{/if}</div>
-								</div>
-								<div class="shop-content-extra">
-									{foreach $shop->content_extra() as $service}
-									<div><span class="icon">{$service[0]}</span> {$service[1]}</div>
-									{/foreach}
-								</div>
-								<a class="btn btn-brand-accent shop-btn" href="javascript:void(0);" onClick="buy('{$shop->id}',{$shop->auto_renew})">购买</a>
-					  </div>
-				  </div>
-				{/foreach}
-				
-				<div class="flex-fix3"></div>
-				<div class="flex-fix4"></div>
-			</div>
-
-            <div class="shop-table">
-				
-					{foreach $shops as $shop}
-					<div class="shop-gridarea">
-                        <div class="card">
-								<div>
-									<div class="shop-name"> <span>{$shop->name}</span></div>
-									<div class="card-tag tag-gold">VIP {$shop->user_class()}</div>
-									<div class="card-tag tag-orange">¥ {$shop->price}</div>
-									<div class="card-tag tag-cyan">{$shop->bandwidth()} G</div>
-									<div class="card-tag tag-blue">{$shop->class_expire()} 天</div>
-								</div>
-								<div>
-								<i class="material-icons">expand_more</i>
-								</div>	
-						</div>
-						<a class="btn btn-brand-accent shop-btn" href="javascript:void(0);" onClick="buy('{$shop->id}',{$shop->auto_renew})">购买</a>
-						
-						<div class="shop-drop dropdown-area">
-							<div class="card-tag tag-black">账号有效期</div> <div class="card-tag tag-blue">{$shop->expire()} 天</div>
-							{if {$shop->reset()} == '0' }
-							<div class="card-tag tag-black">重置周期</div> <div class="card-tag tag-blue">N/A</div>
-							{else}
-							<div class="card-tag tag-black">重置周期</div> <div class="card-tag tag-blue">{$shop->reset_exp()} 天</div>
-							<div class="card-tag tag-black">重置频率</div><div class="card-tag tag-blue">{$shop->reset_value()}G/{$shop->reset()}天</div>
-							{/if}
-								{if {$shop->speedlimit()} == '0' }
-								<div class="card-tag tag-black">端口速率</div> <div class="card-tag tag-blue">无限制</div>
-								{else}
-								<div class="card-tag tag-black">端口限速</div> <div class="card-tag tag-blue">{$shop->speedlimit()} Mbps</div>
-								{/if}
-								{if {$shop->connector()} == '0' }
-								<div class="card-tag tag-black">客户端数量</div> <div class="card-tag tag-blue">无限制</div>
-								{else}
-								<div class="card-tag tag-black">客户端限制</div> <div class="card-tag tag-blue">{$shop->connector()} 个</div>
-								{/if}
-						</div>
-					</div>
-					{/foreach}
-				
-            </div>
-					
-					
-					
-					<div aria-hidden="true" class="modal modal-va-middle fade" id="coupon_modal" role="dialog" tabindex="-1">
-						<div class="modal-dialog modal-xs">
-							<div class="modal-content">
-								<div class="modal-heading">
-									<a class="modal-close" data-dismiss="modal">×</a>
-									<h2 class="modal-title">您有优惠码吗？</h2>
-								</div>
-								<div class="modal-inner">
-									<div class="form-group form-group-label">
-										<label class="floating-label" for="coupon">有的话，请在这里输入。没有的话，直接确定吧</label>
-										<input class="form-control maxwidth-edit" id="coupon" type="text">
-									</div>
-								</div>
-								<div class="modal-footer">
-									<p class="text-right"><button class="btn btn-flat btn-brand waves-attach" data-dismiss="modal" id="coupon_input" type="button">确定</button></p>
-								</div>
-							</div>
-						</div>
-					</div>
-					
-					
-					<div aria-hidden="true" class="modal modal-va-middle fade" id="order_modal" role="dialog" tabindex="-1">
-						<div class="modal-dialog modal-xs">
-							<div class="modal-content">
-								<div class="modal-heading">
-									<a class="modal-close" data-dismiss="modal">×</a>
-									<h2 class="modal-title">订单确认</h2>
-								</div>
-								<div class="modal-inner">
-									<p id="name">商品名称：</p>
-									<p id="credit">优惠额度：</p>
-									<p id="total">总金额：</p>
-
-									<div class="checkbox switch">
-										<label for="disableothers">
-											<input checked class="access-hide" id="disableothers" type="checkbox">
-											<span class="switch-toggle"></span>关闭旧套餐自动续费
-										</label>
-									</div>
-									<br/>
-									<div class="checkbox switch" id="autor">
-										<label for="autorenew">
-											<input checked class="access-hide" id="autorenew" type="checkbox">
-											<span class="switch-toggle"></span>到期时自动续费
-										</label>
-									</div>
-									
-								</div>
-								
-								<div class="modal-footer">
-									<p class="text-right"><button class="btn btn-flat btn-brand waves-attach" data-dismiss="modal" id="order_input" type="button">确定</button></p>
-								</div>
-							</div>
-						</div>
-					</div>
-					
-					{include file='dialog.tpl'}
-	
-			</div>
-			
-			
-			
-		</div>
-	</main>
-
-
-
-
-
-
-
-
-
+{include file='user/dialog.tpl'}
 {include file='user/footer.tpl'}
-
-
+	</main>
+{include file='user/assets/js.tpl'}
+</body>
 <script>
 function buy(id,auto) {
-	if(auto==0)
+    var usermoney = "{$user->money}";
+    if (usermoney < "1") {
+        layui.use('layer', function(){
+            var layer = layui.layer;
+	        layer.alert('余额不足，请充值！', function(index){
+		        window.setTimeout("location.href='/user/code'");
+	        });   
+         }); 
+    return false;
+    }
+
+	if(auto == 0)
 	{
 		document.getElementById('autor').style.display="none";
 	}
@@ -227,37 +168,11 @@ function buy(id,auto) {
 	{
 		document.getElementById('autor').style.display="";
 	}
-	shop=id;
+	
+	shop = id;
 	$("#coupon_modal").modal();
 }
 
-;(function(){
-	
-	//UI切换
-	let elShopCard = $$.querySelector(".shop-flex");
-	let elShopTable = $$.querySelector(".shop-table");
-	
-	let switchToCard = new UIswitch('switch-cards',elShopTable,elShopCard,'flex','tempshop');
-	switchToCard.listenSwitch();
-    
-	let switchToTable = new UIswitch('switch-table',elShopCard,elShopTable,'flex','tempshop');
-	switchToTable.listenSwitch();
-
-	switchToCard.setDefault();
-	switchToTable.setDefault();
-	
-	//手风琴
-	let dropDownButton = document.querySelectorAll('.shop-table .card');
-	let dropDownArea = document.querySelectorAll('.dropdown-area');
-	let arrows = document.querySelectorAll('.shop-table .card i');
-	
-	for (let i=0;i<dropDownButton.length;i++) {
-		rotatrArrow(dropDownButton[i],arrows[i]);
-		custDropdown(dropDownButton[i], dropDownArea[i]);
-	}
-
-})();
-    
 
 $("#coupon_input").click(function () {
 		$.ajax({
@@ -275,13 +190,11 @@ $("#coupon_input").click(function () {
 					$("#total").html("总金额："+data.total);
 					$("#order_modal").modal();
 				} else {
-					$("#result").modal();
-					$("#msg").html(data.msg);
+					layer.open({ content: data.msg });
 				}
 			},
 			error: function (jqXHR) {
-				$("#result").modal();
-                $("#msg").html(data.msg+"  发生了错误。");
+				layer.open({ content: data.msg+'  发生了错误。' });
 			}
 		})
 	});
@@ -303,7 +216,7 @@ $("#order_input").click(function () {
 		else{
 			var disableothers=0;
 		}
-			
+  
 		$.ajax({
 			type: "POST",
 			url: "buy",
@@ -316,19 +229,17 @@ $("#order_input").click(function () {
 			},
 			success: function (data) {
 				if (data.ret) {
-					$("#result").modal();
-					$("#msg").html(data.msg);
+					layer.open({ content: data.msg });
 					window.setTimeout("location.href='/user/shop'", {$config['jump_delay']});
 				} else {
-					$("#result").modal();
-					$("#msg").html(data.msg);
+					layer.open({ content: data.msg });
 				}
 			},
 			error: function (jqXHR) {
-				$("#result").modal();
-                $("#msg").html(data.msg+"  发生了错误。");
+				layer.open({ content: data.msg+'  发生了错误。' });
 			}
 		})
 	});
 
 </script>
+</html>

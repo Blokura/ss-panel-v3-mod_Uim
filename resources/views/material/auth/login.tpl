@@ -1,344 +1,162 @@
- {include file='header.tpl'}
-
-
-<div class="authpage">
-    <div class="container">
-        <form action="javascript:void(0);" method="POST">
-            <div class="auth-main auth-row auth-col-one">
-                <div class="auth-top auth-row">
-                    <a class="boardtop-left" href="/">
-                        <div>首 页</div>
-                    </a>
-                    <div class="auth-logo">
-                        <img src="/images/authlogo.jpg" alt="">
-                    </div>
-                    <a href="/auth/register" class="boardtop-right">
-                        <div>注 册</div>
-                    </a>
-                </div>
-                <div class="auth-row">
-                    <div class="form-group-label auth-row row-login">
-                        <label class="floating-label" for="email">邮箱</label>
-                        <input class="form-control maxwidth-auth" id="email" type="text" name="Email">
-                    </div>
-                </div>
-                <div class="auth-row">
-                    <div class="form-group-label auth-row row-login">
-                        <label class="floating-label" for="passwd">密码</label>
-                        <input class="form-control maxwidth-auth" id="passwd" type="password" name="Password">
-                    </div>
-                </div>
-                <div class="auth-row">
-                    <div class="form-group-label auth-row row-login">
-                        <label class="floating-label" for="code">两步验证码（未设置请忽略）</label>
-                        <input class="form-control maxwidth-auth" id="code" type="text" name="Code">
-                    </div>
-                </div>
-
-                {if $geetest_html != null}
-                <div class="form-group-label labelgeetest auth-row">
-                    <div id="embed-captcha"></div>
-                </div>
-                {/if}
-                {if $recaptcha_sitekey != null}
-                    <div class="form-group-label labelgeetest auth-row">
-                        <div class="row">
-                            <div align="center" class="g-recaptcha" data-sitekey="{$recaptcha_sitekey}"></div>
-                        </div>
-                    </div>
-                {/if}
-
-                <div class="btn-auth auth-row">
-                    <button id="login" type="submit" class="btn btn-block btn-brand waves-attach waves-light">
-                        确认登录
-                    </button>
-                </div>
-                <div class="auth-help auth-row">
-                    <div class="auth-help-table auth-row">
-                        <div class="checkbox checkbox-adv">
-                            <label for="remember_me">
-                                <input class="access-hide" value="week" id="remember_me" name="remember_me" type="checkbox">记住我
-                                <span class="checkbox-circle"></span><span class="checkbox-circle-check"></span><span
-                                    class="checkbox-circle-icon icon">done</span>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>登录 - {$config["appName"]}</title>
+    <link href="/theme/assets/home/css/style.css" rel="stylesheet" type="text/css" />
+    <link href="/theme/assets/home/css/bimoe.css" rel="stylesheet" type="text/css" />
+    <link href="/theme/assets/layui/layui.css" rel="stylesheet" type="text/css" />
+    {include file='tongji.tpl'}
+</head>
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+    <symbol id="icon-envelope" viewBox="0 0 512 512"><path d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z" /></symbol>
+    <symbol id="icon-lock" viewBox="0 0 448 512"><path d="M400 224h-24v-72C376 68.2 307.8 0 224 0S72 68.2 72 152v72H48c-26.5 0-48 21.5-48 48v192c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V272c0-26.5-21.5-48-48-48zm-104 0H152v-72c0-39.7 32.3-72 72-72s72 32.3 72 72v72z" /></symbol>
+    <symbol id="icon-shield" viewBox="0 0 512 512"><path d="M466.5 83.7l-192-80a48.15 48.15 0 0 0-36.9 0l-192 80C27.7 91.1 16 108.6 16 128c0 198.5 114.5 335.7 221.5 380.3 11.8 4.9 25.1 4.9 36.9 0C360.1 472.6 496 349.3 496 128c0-19.4-11.7-36.9-29.5-44.3zM256.1 446.3l-.1-381 175.9 73.3c-3.3 151.4-82.1 261.1-175.8 307.7z" /></symbol>
+</svg>
+<body>
+    <div id="wrap-login">
+        <div class="container">
+            <div class="bimoe-wrap">
+                <div class="bimoe-inner">
+                    <h3 class="bimoe-form-title">
+                        登录<span class="bimoe-switch pull-right">还没有帐号？<a href="register">立即注册</a></span>
+                    </h3>
+                    <form class="bimoe-form" action="javascript:void(0);"  method="POST">
+                        <div class="bimoe-form-group">    
+                            <label>
+                                <svg class="font-icon"><use xlink:href="#icon-envelope" /></svg>
+                                <input type="txt" id="email" class="bimoe-form-input require" name="Email" placeholder="电子邮箱" />
                             </label>
                         </div>
-                        <a href="/password/reset">忘记密码？</a>
-                    </div>
-                </div>
-                <div class="auth-bottom auth-row">
-                    <div class="tgauth">
-                    {if $config['enable_telegram'] == 'true'}
-                    <span>Telegram</span><button class="btn" id="calltgauth"><i class="icon icon-lg">near_me</i></button><span>快捷登录</span>
-                    {else}
-                    <button class="btn" style="cursor:unset;"></button>
-                    {/if}
-                    </div>
-                </div>
-            </div>
-        </form>
-        <div class="card auth-tg cust-model">
-            <div class="card-main">
-                <nav class="tab-nav margin-top-no margin-bottom-no">
-                    <ul class="nav nav-justified">
-                        <li class="active">
-                            <a class="waves-attach" data-toggle="tab" href="#number_login"> 一键/验证码登录</a>
-                        </li>
-                        <li>
-                            <a class="waves-attach" data-toggle="tab" href="#qrcode_login">二维码登录</a>
-                        </li>
-                    </ul>
-                </nav>
-                <div class="tab-pane fade active in" id="number_login">
-                    <div class="card-header">
-                        <div class="card-inner">
-                            <h1 class="card-heading" style=" text-align:center;font-weight:bold;">Telegram登录</h1>
+                        <div class="bimoe-form-group">
+                            <label>
+                                <svg class="font-icon"><use xlink:href="#icon-lock" /></svg>
+                                <input type="password" id="passwd" class="bimoe-form-input require" name="Password" placeholder="登录密码" />
+                            </label>
                         </div>
-                    </div>
-                    <div class="card-inner">
-
-                        <div class="text-center">
-                            <p>一键登陆</p>
+                        {*
+                        <div class="bimoe-form-group">
+                            <label>
+                                <svg class="font-icon"><use xlink:href="#icon-shield" /></svg>
+                                <input type="txt" id="code" class="bimoe-form-input require" name="Code" placeholder="两步验证码（未设置请忽略）" />
+                            </label>
                         </div>
-                        <p id="telegram-alert">正在载入 Telegram，如果长时间未显示请刷新页面或检查代理</p>
-                        <div class="text-center" id="telegram-login-box"></div>
-                        <p>或者添加机器人账号 <a href="https://t.me/{$telegram_bot}">@{$telegram_bot}</a>，发送下面的数字给它。
-                        </p>
-                        <div class="text-center">
-                            <h2><code id="code_number">{$login_number}</code></h2>
+                        *}
+                        {if $geetest_html != null}
+                        <div class="bimoe-form-group">
+                            <label>
+                                <div id="embed-captcha"></div>
+                            </label>
                         </div>
-
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="qrcode_login">
-                    <div class="card-header">
-                        <div class="card-inner">
-                            <h1 class="card-heading" style=" text-align:center;font-weight:bold;">Telegram扫码登录</h1>
+                        {/if}
+                        {if $recaptcha_sitekey != null}
+                        <div class="bimoe-form-group">
+                            <label>
+                                <div align="center" class="g-recaptcha" data-sitekey="{$recaptcha_sitekey}"></div>
+                            </label>
                         </div>
-                    </div>
-                    <div class="card-inner">
-
-                        <p>添加机器人账号 <a href="https://t.me/{$telegram_bot}">@{$telegram_bot}</a>，拍下下面这张二维码发给它。
-                        </p>
-                        <div class="form-group form-group-label">
-                            <div class="text-center qr-center">
-                                <div id="telegram-qr"></div>
+                        {/if}
+                        <div class="checkbox">
+                            <label class="bimoe-checkbox">
+                                <input type="checkbox" id="remember_me" name="remember" checked><span class="bimoe-check"></span>记住登录状态
+                            </label>
+                            <div class="pull-right">
+                                <a href="/password/reset">
+                                    忘记密码？
+                                </a>
                             </div>
                         </div>
-
-                    </div>
+                        <div class="last">
+                            <input class="btn btn-login btn-block btn-lg" type="submit" id="login" value="登录">
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
+        <p class="text-center" style="padding-top: 20px;">
+            <script type="text/javascript">document.write(new Date().getFullYear());</script> © <a href="/staff">STAFF</a> - {$config["appName"]}
+        </p>
     </div>
-</div>
-
-
-
-
-{include file='dialog.tpl'}
-
-{include file='footer.tpl'}
-</div>
-{literal}
-<script>
-    let calltgbtn = document.querySelector('#calltgauth');
-    let tgboard = document.querySelector('.card.auth-tg.cust-model');
-    if (calltgbtn && tgboard)
-    custModal(calltgbtn,tgboard);
-</script>
-{/literal}
-<script>
-    $(document).ready(function () {
-        function login() {
-            {if $geetest_html != null}
-            if (typeof validate == 'undefined') {
-                $("#result").modal();
-                $("#msg").html("请滑动验证码来完成验证。");
-                return;
-            }
-
-            if (!validate) {
-                $("#result").modal();
-                $("#msg").html("请滑动验证码来完成验证。");
-                return;
-            }
-
-            {/if}
-
-            document.getElementById("login").disabled = true;
-
-            $.ajax({
-                type: "POST",
-                url: "/auth/login",
-                dataType: "json",
-                data: {
-                    email: $("#email").val(),
-                    passwd: $("#passwd").val(),
-                    code: $("#code").val(),{if $recaptcha_sitekey != null}
-                    recaptcha: grecaptcha.getResponse(),{/if}
-                    remember_me: $("#remember_me:checked").val(){if $geetest_html != null},
-                    geetest_challenge: validate.geetest_challenge,
-                    geetest_validate: validate.geetest_validate,
-                    geetest_seccode: validate.geetest_seccode{/if}
-                },
-                success: function (data) {
-                    if (data.ret == 1) {
-                        $("#result").modal();
-                        $("#msg").html(data.msg);
-                        window.setTimeout("location.href='/user'", {$config['jump_delay']});
-                    } else {
-                        $("#result").modal();
-                        $("#msg").html(data.msg);
-                        document.getElementById("login").disabled = false;
-                        {if $geetest_html != null}
-                        captcha.refresh();
-                        {/if}
-                    }
-                },
-                error: function (jqXHR) {
-                    $("#msg-error").hide(10);
-                    $("#msg-error").show(100);
-                    $("#msg-error-p").html("发生错误：" + jqXHR.status);
-                    document.getElementById("login").disabled = false;
-                    {if $geetest_html != null}
-                    captcha.refresh();
-                    {/if}
-                }
-            });
-        }
-
-        $("html").keydown(function (event) {
-            if (event.keyCode == 13) {
-                login();
-            }
-        });
-        $("#login").click(function () {
-            login();
-        });
-
-        $('div.modal').on('shown.bs.modal', function () {
-            $("div.gt_slider_knob").hide();
-        });
-
-        $('div.modal').on('hidden.bs.modal', function () {
-            $("div.gt_slider_knob").show();
-        });
-    })
-</script>
-
-{if $config['enable_telegram'] == 'true'}
-    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
-    <script>
-        var telegram_qrcode = 'mod://login/{$login_token}';
-        var qrcode = new QRCode(document.getElementById("telegram-qr"));
-        qrcode.clear();
-        qrcode.makeCode(telegram_qrcode);
-    </script>
+    <script src="/theme/assets/home/js/jquery.min.js"></script>
+    <script src="//static.geetest.com/static/tools/gt.js"></script>
+    <script src="/theme/assets/layui/layui.js"></script>
     <script>
         $(document).ready(function () {
-            $("#calltgauth").click(
-                function(){
-                    f();
+            layui.use('layer', function(){});
+            {if $geetest_html != null}
+            var handlerEmbed = function (captchaObj) {
+                captchaObj.onSuccess(function () {
+                    validate = captchaObj.getValidate();
+                });
+                captchaObj.appendTo("#embed-captcha");
+                captcha = captchaObj;
+            };
+            initGeetest({
+                gt: "{$geetest_html->gt}",
+                challenge: "{$geetest_html->challenge}",
+                product: "embed",
+                offline: {if $geetest_html->success}0{else}1{/if}
+            }, handlerEmbed);
+            {/if}
+            login = function() {
+                {if $geetest_html != null}
+                if (typeof validate == 'undefined') {
+                    layer.msg("请滑动验证码来完成验证。");
+                    return;
                 }
-            );
-            function f() {
+                if (!validate) {
+                    layer.msg("请滑动验证码来完成验证。");
+                    return;
+                }
+                {/if}
+                document.getElementById("login").disabled = true;
                 $.ajax({
                     type: "POST",
-                    url: "qrcode_check",
+                    url: "/auth/login",
                     dataType: "json",
                     data: {
-                        token: "{$login_token}",
-                        number: "{$login_number}"
+                        email: $("#email").val(),
+                        passwd: $("#passwd").val(),
+                        code: $("#code").val(),{if $recaptcha_sitekey != null}
+                        recaptcha: grecaptcha.getResponse(),{/if}
+                        remember_me: $("#remember_me:checked").val(){if $geetest_html != null},
+                        geetest_challenge: validate.geetest_challenge,
+                        geetest_validate: validate.geetest_validate,
+                        geetest_seccode: validate.geetest_seccode{/if}
                     },
                     success: function (data) {
-                        if (data.ret > 0) {
-                            clearTimeout(tid);
-
-                            $.ajax({
-                                type: "POST",
-                                url: "/auth/qrcode_login",
-                                dataType: "json",
-                                data: {
-                                    token: "{$login_token}",
-                                    number: "{$login_number}"
-                                },
-                                success: function (data) {
-                                    if (data.ret) {
-                                        $("#result").modal();
-                                        $("#msg").html("登录成功！");
-                                        window.setTimeout("location.href=/user/", {$config['jump_delay']});
-                                    }
-                                },
-                                error: function (jqXHR) {
-                                    $("#result").modal();
-                                    $("#msg").html("发生错误：" + jqXHR.status);
-                                }
-                            });
-
+                        if (data.ret == 1) {
+                            layer.msg(data.msg);
+                            window.setTimeout("location.href='/user'", {$config['jump_delay']});
                         } else {
-                            if (data.ret == -1) {
-                                $('#telegram-qr').replaceWith('此二维码已经过期，请刷新页面后重试。');
-                                $('#code_number').replaceWith('<code id="code_number">此数字已经过期，请刷新页面后重试。</code>');
-                            }
+                            layer.msg(data.msg);  
+                            document.getElementById("login").disabled = false;
+                            {if $geetest_html != null}
+                                captcha.reset();
+                            {/if}
                         }
                     },
                     error: function (jqXHR) {
-                        if (jqXHR.status != 200 && jqXHR.status != 0) {
-                            $("#result").modal();
-                            $("#msg").html("发生错误：" + jqXHR.status);
-                        }
+                        layer.msg("发生错误：" + jqXHR.status);
+                        document.getElementById("login").disabled = false;
+                        {if $geetest_html != null}
+                            captcha.reset();
+                        {/if}
                     }
                 });
-                tid = setTimeout(f, 2500); //循环调用触发setTimeout
             }
-
-
+            $("html").keydown(function (event) {
+                if (event.keyCode == 13) {
+                    login();
+                }
+            });
+            $("#login").click(function () {
+                login();
+            });
         })
     </script>
-{/if}
-
-
-{if $geetest_html != null}
-    <script>
-        var handlerEmbed = function (captchaObj) {
-            // 将验证码加到id为captcha的元素里
-
-            captchaObj.onSuccess(function () {
-                validate = captchaObj.getValidate();
-            });
-
-            captchaObj.appendTo("#embed-captcha");
-
-            captcha = captchaObj;
-            // 更多接口参考：http://www.geetest.com/install/sections/idx-client-sdk.html
-        };
-
-        initGeetest({
-            gt: "{$geetest_html->gt}",
-            challenge: "{$geetest_html->challenge}",
-            product: "embed", // 产品形式，包括：float，embed，popup。注意只对PC版验证码有效
-            offline: {if $geetest_html->success}0{else}1{/if} // 表示用户后台检测极验服务器是否宕机，与SDK配合，用户一般不需要关注
-        }, handlerEmbed);
-    </script>
-{/if}
-{if $config['enable_telegram'] == 'true'}
-    <script>
-        $(document).ready(function () {
-            var el = document.createElement('script');
-            document.getElementById('telegram-login-box').append(el);
-            el.onload = function () {
-                $('#telegram-alert').remove()
-            }
-            el.src = 'https://telegram.org/js/telegram-widget.js?4';
-            el.setAttribute('data-size', 'large')
-            el.setAttribute('data-telegram-login', '{$telegram_bot}')
-            el.setAttribute('data-auth-url', '{$base_url}/auth/telegram_oauth')
-            el.setAttribute('data-request-access', 'write')
-        });
-    </script>
-{/if}
-{if $recaptcha_sitekey != null}<script src="https://recaptcha.net/recaptcha/api.js" async defer></script>{/if}
-<?php
-$a=$_POST['Email'];
-$b=$_POST['Password'];
-?>
+    {if $recaptcha_sitekey != null}<script src="https://recaptcha.net/recaptcha/api.js" async defer></script>{/if}
+</body>
+</html>
